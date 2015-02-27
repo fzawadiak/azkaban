@@ -19,6 +19,7 @@ package azkaban.utils;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -110,21 +111,39 @@ public class DirectoryFlowLoader implements ProjectValidator {
     Arrays.sort(propertyFiles);
 
     for (File file : propertyFiles) {
-      String relative = getRelativeFilePath(base, file.getPath());
-      try {
-        parent = new Props(parent, file);
-        parent.setSource(relative);
+        String relative = getRelativeFilePath(base, file.getPath());
+        try {
+            parent = new Props(parent, file);
+            parent.setSource(relative);
 
-        FlowProps flowProps = new FlowProps(parent);
-        flowPropsList.add(flowProps);
-      } catch (IOException e) {
-        errors.add("Error loading properties " + file.getName() + ":"
-            + e.getMessage());
-      }
+            FlowProps flowProps = new FlowProps(parent);
+            flowPropsList.add(flowProps);
+        } catch (IOException e) {
+            errors.add("Error loading properties " + file.getName() + ":"
+                    + e.getMessage());
+        }
 
-      logger.info("Adding " + relative);
-      propsList.add(parent);
+        logger.info("Adding " + relative);
+        propsList.add(parent);
     }
+
+      File[] paramFiles = dir.listFiles(new SuffixFilter(".params"));
+      Arrays.sort(paramFiles);
+
+      for (File file : paramFiles) {
+          Props props = null;
+          String relative = getRelativeFilePath(base, file.getPath());
+          try {
+              props = new Props(null, file);
+              props.setSource(relative);
+          } catch (IOException e) {
+              errors.add("Error loading params " + file.getName() + ":"
+                      + e.getMessage());
+          }
+
+          logger.info("Adding params " + relative);
+          propsList.add(props);
+      }
 
     // Load all Job files. If there's a duplicate name, then we don't load
     File[] jobFiles = dir.listFiles(new SuffixFilter(JOB_SUFFIX));

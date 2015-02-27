@@ -27,6 +27,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import azkaban.flow.FlowProps;
+import azkaban.project.ProjectManagerException;
+import azkaban.utils.Props;
 import org.apache.commons.lang.StringEscapeUtils;
 
 import azkaban.executor.ExecutableFlow;
@@ -487,6 +490,19 @@ public class ExecutorServlet extends LoginAbstractAzkabanServlet {
 
     ret.put("successEmails", flow.getSuccessEmails());
     ret.put("failureEmails", flow.getFailureEmails());
+
+    HashMap<String,String> params = new HashMap<String,String>();
+    try {
+      Props props = projectManager.getProperties(project, flow.getId() + ".params");
+      if (props != null) {
+        for (String key : props.localKeySet()) {
+          params.put(key, props.get(key));
+        }
+        ret.put("flowParam", params);
+      }
+    } catch(ProjectManagerException e) {
+
+    }
 
     Schedule sflow = null;
     try {
