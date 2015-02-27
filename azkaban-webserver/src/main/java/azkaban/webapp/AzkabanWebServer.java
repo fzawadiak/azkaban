@@ -35,6 +35,7 @@ import javax.management.MBeanInfo;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
+import azkaban.webapp.servlet.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.velocity.app.VelocityEngine;
@@ -86,6 +87,7 @@ import azkaban.utils.FileIOUtils;
 import azkaban.utils.Props;
 import azkaban.utils.PropsUtils;
 import azkaban.utils.Utils;
+<<<<<<< Updated upstream
 import azkaban.webapp.servlet.AbstractAzkabanServlet;
 import azkaban.webapp.servlet.ExecutorServlet;
 import azkaban.webapp.servlet.IndexRedirectServlet;
@@ -96,6 +98,8 @@ import azkaban.webapp.servlet.ProjectServlet;
 import azkaban.webapp.servlet.ProjectManagerServlet;
 import azkaban.webapp.servlet.StatsServlet;
 import azkaban.webapp.servlet.TriggerManagerServlet;
+=======
+>>>>>>> Stashed changes
 import azkaban.webapp.plugin.TriggerPlugin;
 import azkaban.webapp.plugin.ViewerPlugin;
 import azkaban.webapp.plugin.PluginRegistry;
@@ -702,6 +706,8 @@ public class AzkabanWebServer extends AzkabanServer {
       secureConnector.setTrustPassword(azkabanSettings
           .getString("jetty.trustpassword"));
       secureConnector.setHeaderBufferSize(MAX_HEADER_BUFFER_SIZE);
+      secureConnector.setWantClientAuth(azkabanSettings
+          .getBoolean("jetty.clientauth"));
 
       server.addConnector(secureConnector);
     } else {
@@ -772,6 +778,7 @@ public class AzkabanWebServer extends AzkabanServer {
     root.addServlet(new ServletHolder(new JMXHttpServlet()), "/jmx");
     root.addServlet(new ServletHolder(new TriggerManagerServlet()), "/triggers");
     root.addServlet(new ServletHolder(new StatsServlet()), "/stats");
+    root.addServlet(new ServletHolder(new StatusServlet()), "/status");
 
     ServletHolder restliHolder = new ServletHolder(new RestliServlet());
     restliHolder.setInitParameter("resourcePackages", "azkaban.restli");
