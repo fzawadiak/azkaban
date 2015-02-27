@@ -87,7 +87,6 @@ import azkaban.utils.FileIOUtils;
 import azkaban.utils.Props;
 import azkaban.utils.PropsUtils;
 import azkaban.utils.Utils;
-<<<<<<< Updated upstream
 import azkaban.webapp.servlet.AbstractAzkabanServlet;
 import azkaban.webapp.servlet.ExecutorServlet;
 import azkaban.webapp.servlet.IndexRedirectServlet;
@@ -98,8 +97,6 @@ import azkaban.webapp.servlet.ProjectServlet;
 import azkaban.webapp.servlet.ProjectManagerServlet;
 import azkaban.webapp.servlet.StatsServlet;
 import azkaban.webapp.servlet.TriggerManagerServlet;
-=======
->>>>>>> Stashed changes
 import azkaban.webapp.plugin.TriggerPlugin;
 import azkaban.webapp.plugin.ViewerPlugin;
 import azkaban.webapp.plugin.PluginRegistry;
