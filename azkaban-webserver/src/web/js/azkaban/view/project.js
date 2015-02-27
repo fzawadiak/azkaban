@@ -133,7 +133,6 @@ azkaban.FlowTableView = Backbone.View.extend({
       }
 
       var ida = document.createElement("a");
-      $(ida).css("margin-left", level * 20);
       $(ida).attr("href", requestURL + name);
       $(ida).text(name);
 

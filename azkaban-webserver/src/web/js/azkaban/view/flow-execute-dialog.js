@@ -193,6 +193,8 @@ azkaban.FlowExecuteDialogView = Backbone.View.extend({
       }
     }
 
+    $(".editRow").remove();
+
     var loadedId = executableGraphModel.get("flowId");
     this.loadGraph(projectName, flowId, exgraph, loadCallback);
     this.loadFlowInfo(projectName, flowId, execId);
