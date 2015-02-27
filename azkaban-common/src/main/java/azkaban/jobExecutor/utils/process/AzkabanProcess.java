@@ -191,10 +191,17 @@ public class AzkabanProcess {
   private int processId(final java.lang.Process process) {
     int processId = 0;
     try {
-      Field f = process.getClass().getDeclaredField("pid");
-      f.setAccessible(true);
+      if(process.getClass().equals("java.lang.UNIXProcess")) {
+        Field f = process.getClass().getDeclaredField("pid");
+        f.setAccessible(true);
 
-      processId = f.getInt(process);
+        processId = f.getInt(process);
+      } else {
+        Field f = process.getClass().getDeclaredField("handle");
+        f.setAccessible(true);
+        long handle = f.getLong(process);
+        processId = (int)handle;
+      }
     } catch (Throwable e) {
       e.printStackTrace();
     }

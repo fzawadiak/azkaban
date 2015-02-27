@@ -25,11 +25,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.util.*;
 
 import org.apache.commons.io.IOUtils;
 
@@ -83,10 +81,44 @@ public class FileIOUtils {
     }
   }
 
+  public static void createDeepSymlink(File sourceDir, File destDir) throws IOException {
+    if (!sourceDir.exists()) {
+      throw new IOException("Source directory " + sourceDir.getPath()
+              + " doesn't exist");
+    } else if (!destDir.exists()) {
+      throw new IOException("Destination directory " + destDir.getPath()
+              + " doesn't exist");
+    } else if (sourceDir.isFile() && destDir.isFile()) {
+      throw new IOException("Source or Destination is not a directory.");
+    }
+
+    final Path sourcePath = sourceDir.toPath();
+    final Path destPath = destDir.toPath();
+
+    Files.walkFileTree(sourcePath,
+      new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
+                throws IOException {
+          Path targetdir = destPath.resolve(sourcePath.relativize(dir));
+          if(Files.notExists(targetdir))
+            Files.createDirectory(targetdir);
+          return FileVisitResult.CONTINUE;
+        }
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                throws IOException {
+          Path d = destPath.resolve(sourcePath.relativize(file));
+          Files.createSymbolicLink(destPath.resolve(sourcePath.relativize(file)),destPath.relativize(file));
+          return FileVisitResult.CONTINUE;
+        }
+      });
+  }
+
   /**
    * Run a unix command that will symlink files, and recurse into directories.
    */
-  public static void createDeepSymlink(File sourceDir, File destDir)
+  public static void createDeepSymlinkOld(File sourceDir, File destDir)
       throws IOException {
     if (!sourceDir.exists()) {
       throw new IOException("Source directory " + sourceDir.getPath()
@@ -97,6 +129,9 @@ public class FileIOUtils {
     } else if (sourceDir.isFile() && destDir.isFile()) {
       throw new IOException("Source or Destination is not a directory.");
     }
+
+    System.out.println("Source: "+sourceDir);
+    System.out.println("Target: "+destDir);
 
     Set<String> paths = new HashSet<String>();
     createDirsFindFiles(sourceDir, sourceDir, destDir, paths);
@@ -111,6 +146,7 @@ public class FileIOUtils {
     }
 
     String command = buffer.toString();
+    System.out.println("Command: "+command);
     ProcessBuilder builder = new ProcessBuilder().command("sh", "-c", command);
     builder.directory(destDir);
 
