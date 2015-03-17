@@ -190,8 +190,9 @@ public class AzkabanProcess {
    */
   private int processId(final java.lang.Process process) {
     int processId = 0;
+
     try {
-      if(process.getClass().equals("java.lang.UNIXProcess")) {
+      if("java.lang.UNIXProcess".equals(process.getClass().getCanonicalName())) {
         Field f = process.getClass().getDeclaredField("pid");
         f.setAccessible(true);
 
