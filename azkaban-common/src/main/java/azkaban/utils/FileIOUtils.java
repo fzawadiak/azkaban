@@ -97,88 +97,30 @@ public class FileIOUtils {
 
     Files.walkFileTree(sourcePath,
       new SimpleFileVisitor<Path>() {
+        Path lastDir = sourcePath;
         @Override
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
                 throws IOException {
-          Path targetdir = destPath.resolve(sourcePath.relativize(dir));
-          if(Files.notExists(targetdir))
-            Files.createDirectory(targetdir);
+          Path targetDir = destPath.resolve(sourcePath.relativize(dir));
+          if(Files.notExists(targetDir)) {
+              Files.createDirectory(targetDir);
+              lastDir = dir;
+          }
+          return FileVisitResult.CONTINUE;
+        }
+        @Override
+        public FileVisitResult postVisitDirectory(Path dir, IOException exception)
+                throws IOException {
+          lastDir = dir.getParent();
           return FileVisitResult.CONTINUE;
         }
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
                 throws IOException {
-          Path d = destPath.resolve(sourcePath.relativize(file));
-          Files.createSymbolicLink(destPath.resolve(sourcePath.relativize(file)),destPath.relativize(file));
-          return FileVisitResult.CONTINUE;
+          Files.createSymbolicLink(destPath.resolve(sourcePath.relativize(file)), destPath.resolve(sourcePath.relativize(lastDir)).relativize(file));
+        return FileVisitResult.CONTINUE;
         }
       });
-  }
-
-  /**
-   * Run a unix command that will symlink files, and recurse into directories.
-   */
-  public static void createDeepSymlinkOld(File sourceDir, File destDir)
-      throws IOException {
-    if (!sourceDir.exists()) {
-      throw new IOException("Source directory " + sourceDir.getPath()
-          + " doesn't exist");
-    } else if (!destDir.exists()) {
-      throw new IOException("Destination directory " + destDir.getPath()
-          + " doesn't exist");
-    } else if (sourceDir.isFile() && destDir.isFile()) {
-      throw new IOException("Source or Destination is not a directory.");
-    }
-
-    System.out.println("Source: "+sourceDir);
-    System.out.println("Target: "+destDir);
-
-    Set<String> paths = new HashSet<String>();
-    createDirsFindFiles(sourceDir, sourceDir, destDir, paths);
-
-    StringBuffer buffer = new StringBuffer();
-    for (String path : paths) {
-      File sourceLink = new File(sourceDir, path);
-      path = "." + path;
-
-      buffer.append("ln -s ").append(sourceLink.getAbsolutePath()).append("/*")
-          .append(" ").append(path).append(";");
-    }
-
-    String command = buffer.toString();
-    System.out.println("Command: "+command);
-    ProcessBuilder builder = new ProcessBuilder().command("sh", "-c", command);
-    builder.directory(destDir);
-
-    // XXX what about stopping threads ??
-    Process process = builder.start();
-    try {
-      NullLogger errorLogger = new NullLogger(process.getErrorStream());
-      NullLogger inputLogger = new NullLogger(process.getInputStream());
-      errorLogger.start();
-      inputLogger.start();
-
-      try {
-        if (process.waitFor() < 0) {
-          // Assume that the error will be in standard out. Otherwise it'll be
-          // in standard in.
-          String errorMessage = errorLogger.getLastMessages();
-          if (errorMessage.isEmpty()) {
-            errorMessage = inputLogger.getLastMessages();
-          }
-
-          throw new IOException(errorMessage);
-        }
-
-        // System.out.println(errorLogger.getLastMessages());
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    } finally {
-      IOUtils.closeQuietly(process.getInputStream());
-      IOUtils.closeQuietly(process.getOutputStream());
-      IOUtils.closeQuietly(process.getErrorStream());
-    }
   }
 
   private static void createDirsFindFiles(File baseDir, File sourceDir,

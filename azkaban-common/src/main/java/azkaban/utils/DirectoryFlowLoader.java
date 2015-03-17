@@ -135,7 +135,7 @@ public class DirectoryFlowLoader implements ProjectValidator {
           String relative = getRelativeFilePath(base, file.getPath());
           try {
               props = new Props(null, file);
-              props.setSource(relative);
+              props.setSource(file.getName());
           } catch (IOException e) {
               errors.add("Error loading params " + file.getName() + ":"
                       + e.getMessage());
