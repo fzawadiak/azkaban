@@ -168,6 +168,8 @@
                           <tr id="addRow" class="addRow">
                             <td id="addRow-col" colspan="2">
                               <button type="button" class="btn btn-success btn-xs" id="add-btn">Add Row</button>
+                              <input type="file" id="upload-file" class="btn-xs" title="Upload&hellip;" />
+                              <button type="button" class="btn btn-xs" id="download-btn">Download&hellip;</button>
                             </td>
                           </tr>
                         </tbody>

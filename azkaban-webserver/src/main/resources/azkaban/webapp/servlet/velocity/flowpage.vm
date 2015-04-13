@@ -23,6 +23,7 @@
 #parse("azkaban/webapp/servlet/velocity/svgflowincludes.vm")
     <script type="text/javascript" src="${context}/js/moment.min.js"></script>
     <script type="text/javascript" src="${context}/js/bootstrap-datetimepicker.min.js"></script>
+    <script type="text/javascript" src="${context}/js/bootstrap-fileinput.js"></script>
     <script type="text/javascript" src="${context}/js/raphael.min.js"></script>
     <script type="text/javascript" src="${context}/js/morris.min.js"></script>
 

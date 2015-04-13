@@ -43,6 +43,7 @@ azkaban.FlowExecuteDialogView = Backbone.View.extend({
         $('#failure-emails').attr('disabled', "disabled");
       }
     });
+    $('#upload-file').bootstrapFileInput();
   },
 
   render: function() {
@@ -318,6 +319,8 @@ var editTableView;
 azkaban.EditTableView = Backbone.View.extend({
   events: {
     "click table #add-btn": "handleAddRow",
+    "click table #download-btn": "handleDownload",
+    "change table #upload-file": "handleUpload",
     "click table .editable": "handleEditColumn",
     "click table .remove-btn": "handleRemoveColumn"
   },
@@ -369,6 +372,46 @@ azkaban.EditTableView = Backbone.View.extend({
 
     $(tr).insertBefore(".addRow");
     return tr;
+  },
+
+  handleDownload: function(evt) {
+    var obj = this;
+  	var a = document.createElement("a");
+  	a.download = "filename.properties";
+  	var parts = [];
+  	$("tr.editRow").each(function(i,tr) {
+  		var name = $("td.property-key span",tr).html();
+  		var value = $("td.value span",tr).html();
+  		parts.push(name + ": " + value + "\r\n");
+  	})
+  	var blob = new Blob(parts, {type : 'application/text'});
+  	var url = URL.createObjectURL(blob);
+  	a.href = url;
+  	a.click();
+  	URL.revokeObjectURL(url);
+  },
+
+  handleUpload: function(evt) {
+    var obj = this;
+  	var file = evt.target.files[0];
+  	if(file) {
+  		var fr = new FileReader();
+  		fr.onload = function() {
+  			var data = fr.result;
+  			var lines = data.split("\r\n");
+  			var props = $("tr.editRow");
+  			lines.forEach(function(line){
+  				var items = line.match(/([^:]+): ?(.+)[\r\n]*/)
+  				if(items) {
+  					var name = items[1];
+  					var value = items[2];
+  					obj.handleAddRow({paramkey:name,paramvalue:value});
+  				}
+  			})
+  		}
+  		$("tr.editRow").remove();
+  		fr.readAsText(file);
+  	}
   },
 
   handleEditColumn: function(evt) {
