@@ -17,10 +17,7 @@
 package azkaban.webapp.servlet;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -495,7 +492,8 @@ public class ExecutorServlet extends LoginAbstractAzkabanServlet {
     try {
       Props props = projectManager.getProperties(project, flow.getId() + ".params");
       if (props != null) {
-        for (String key : props.localKeySet()) {
+        SortedSet<String> keys = new TreeSet<String>(props.localKeySet());
+        for (String key : keys) {
           params.put(key, props.get(key));
         }
         ret.put("flowParam", params);
