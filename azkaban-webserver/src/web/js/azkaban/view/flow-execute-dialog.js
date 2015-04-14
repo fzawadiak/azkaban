@@ -376,8 +376,9 @@ azkaban.EditTableView = Backbone.View.extend({
 
   handleDownload: function(evt) {
     var obj = this;
+    var data = this.model.get("data");
   	var a = document.createElement("a");
-  	a.download = "filename.properties";
+  	a.download = data.flow + ".params";
   	var parts = [];
   	$("tr.editRow").each(function(i,tr) {
   		var name = $("td.property-key span",tr).html();
@@ -750,7 +751,8 @@ $(function() {
     el: $('#graph-options')
   });
   editTableView = new azkaban.EditTableView({
-    el: $('#editTable')
+    el: $('#editTable'),
+    model: executableGraphModel
   });
 
   contextMenuView = new azkaban.ContextMenuView({
