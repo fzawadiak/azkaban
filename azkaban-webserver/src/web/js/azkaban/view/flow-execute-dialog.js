@@ -389,7 +389,6 @@ azkaban.EditTableView = Backbone.View.extend({
   	var url = URL.createObjectURL(blob);
   	a.href = url;
   	a.click();
-  	URL.revokeObjectURL(url);
   },
 
   handleUpload: function(evt) {
